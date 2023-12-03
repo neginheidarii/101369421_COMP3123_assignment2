@@ -2,9 +2,12 @@ const mongoose = require("mongoose");
 const express = require("express");
 const empRouter = require("./router/employeeRoutes");
 const userRouter = require("./router/userRoutes");
+const cors = require("cors");
+
 
 
 const app = express();
+app.use(cors());
 // PORT
 const PORT = 8086;
 
