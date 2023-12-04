@@ -7,7 +7,6 @@ const userRouter = express.Router();
 // sign up
 userRouter.post("/signup", async (req, res) => {
   try {
-  
     const newUser = new User({
       ...req.body,
     });
@@ -21,25 +20,30 @@ userRouter.post("/signup", async (req, res) => {
 });
 
 // login
+
 userRouter.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const checkUserName = await User.findOne({
+    const checkUser = await User.findOne({
       $or: [{ username: username }, { email: username }],
     });
 
-    if (!checkUserName) {
-      return res.status(400).json({ message: "Invalid Username" });
+    if (!checkUser) {
+      return res.status(400).json({ message: "Invalid Username or Password" });
     }
 
-    const checkPassword = bcrypt.compare(password, checkUserName.password);
-    if (!checkPassword) {
-      return res.status(400).json({ status: false, message: "Invalid Password" });
+    const isPasswordValid = await bcrypt.compare(password, checkUser.password);
+
+    if (!isPasswordValid) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Invalid Username or Password" });
     }
+
     return res.status(200).json({
       status: true,
-      username: checkUserName.username,
+      username: checkUser.username,
       message: "User logged in successfully",
     });
   } catch (err) {
